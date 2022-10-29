@@ -8,7 +8,7 @@ type clickHouseConfig struct {
 	Url                   string       `config:"url"`
 	Table                 string       `config:"table"`
 	Grok                  string       `config:"grok"`
-	GrokField             string       `config:grok_field`
+	GrokField             string       `config:"grok_field"`
 	Columns               []string     `config:"columns"`
 	Codec                 codec.Config `config:"codec"`
 	BulkMaxSize           int          `config:"bulk_max_size"`
