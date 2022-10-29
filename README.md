@@ -18,7 +18,7 @@ includes所在目录：beats/libbeat/publisher/includes/includes.go
 ```go
 import (
 ...
-_ "github.com:lauvinson/filebeat-ck"
+_ "github.com/lauvinson/filebeat-ck"
 )
 ```
 
