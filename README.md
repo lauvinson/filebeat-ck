@@ -8,7 +8,7 @@ Maybe you can mention me or this repo in the acknowledgements too
 -->
 <div align="center">
 
-  <img src="assets/logo.svg" alt="logo" width="200" height="auto" />
+  <img src="assets/logo.png" alt="logo" width="200" height="200" />
   <h1>Filebeat Output To Clickhouse</h1>
 
   <p>
