@@ -1,7 +1,45 @@
-# filebeat-ck
-The output for filebeat support push events to ClickHouse，You need to recompile filebeat with the ClickHouse Output.
+<!--
+Hey, thanks for using the awesome-readme-template template.  
+If you have any enhancements, then fork this project and create a pull request 
+or just open an issue with the label "enhancement".
 
-# Compile
+Don't forget to give this project a star for additional support ;)
+Maybe you can mention me or this repo in the acknowledgements too
+-->
+<div align="center">
+
+[//]: # (  <img src="assets/logo.png" alt="logo" width="200" height="auto" />)
+  <h1>Filebeat Output To Clickhouse</h1>
+
+  <p>
+    The output plugin for filebeat support push events to ClickHouse! 
+  </p>
+
+
+<!-- Badges -->
+<p>
+  <a href="https://github.com/lauvinson/filebeat-ck/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/lauvinson/filebeat-ck" alt="contributors" />
+  </a>
+  <a href="">
+    <img src="https://img.shields.io/github/last-commit/lauvinson/filebeat-ck" alt="last update" />
+  </a>
+  <a href="https://github.com/lauvinson/filebeat-ck/network/members">
+    <img src="https://img.shields.io/github/forks/lauvinson/filebeat-ck" alt="forks" />
+  </a>
+  <a href="https://github.com/lauvinson/filebeat-ck/stargazers">
+    <img src="https://img.shields.io/github/stars/lauvinson/filebeat-ck" alt="stars" />
+  </a>
+  <a href="https://github.com/lauvinson/filebeat-ck/issues/">
+    <img src="https://img.shields.io/github/issues/lauvinson/filebeat-ck" alt="open issues" />
+  </a>
+  <a href="https://github.com/lauvinson/filebeat-ck/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/lauvinson/filebeat-ck.svg" alt="license" />
+  </a>
+</p>
+</div>
+
+# :package: Compile
 ## We need clone beats first
 ```$xslt
 git clone git@github.com:elastic/beats.git
@@ -28,7 +66,7 @@ cd {your beats directory}/github.com/elastic/beats/filebeat
 make
 ```
 
-# Configure Output
+# :running: Configure Output
 ## clickHouse output configuration
 ```yml
 #----------------------------- ClickHouse output --------------------------------
