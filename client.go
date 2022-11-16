@@ -161,7 +161,10 @@ func (c *client) publish(data []publisher.Event) ([]publisher.Event, error) {
 	// happen error, skip unexpected type row
 	if lastErr != nil && c.skipUnexpectedTypeRow {
 		// rollback
-		tx.Rollback()
+		err = tx.Rollback()
+		if err != nil {
+			return nil, err
+		}
 		if len(okExecEvents) > 0 {
 			c.log.Infof("[skip unexpected type row] recall publish, ok-exec-events: %d, fail-exec-events: %d", len(okExecEvents), len(failExecEvents))
 			c.publish(okExecEvents)
