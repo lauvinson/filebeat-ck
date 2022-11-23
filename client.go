@@ -167,12 +167,18 @@ func (c *client) publish(data []publisher.Event) ([]publisher.Event, error) {
 		}
 		if len(okExecEvents) > 0 {
 			c.log.Infof("[skip unexpected type row] recall publish, ok-exec-events: %d, fail-exec-events: %d", len(okExecEvents), len(failExecEvents))
-			c.publish(okExecEvents)
+			_, err = c.publish(okExecEvents)
+			if err != nil {
+				return nil, err
+			}
 		}
 		return nil, nil
 	}
 	if err = tx.Commit(); err != nil {
-		tx.Rollback()
+		err = tx.Rollback()
+		if err != nil {
+			return nil, err
+		}
 		c.log.Errorf("[transaction] commit failed, ok-exec-events: %d, fail-exec-events: %d, err: {%+v}", len(okExecEvents), len(failExecEvents), err)
 		return data, err
 	}
