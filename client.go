@@ -141,7 +141,12 @@ func (c *client) publish(data []publisher.Event) ([]publisher.Event, error) {
 		return data, err
 	}
 	// defer
-	defer stmt.Close()
+	defer func(stmt *sql.Stmt) {
+		err = stmt.Close()
+		if err != nil {
+			c.log.Errorf("[transaction] stmt close fail: {%+v}", err)
+		}
+	}(stmt)
 	var lastErr error
 	var okExecEvents, failExecEvents []publisher.Event
 	for k, row := range formatRows {
