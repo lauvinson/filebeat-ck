@@ -4,11 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	_ "github.com/ClickHouse/clickhouse-go"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/vjeantet/grok"
+	"strings"
 	"sync"
+	"time"
 )
 
 type client struct {
@@ -184,4 +187,95 @@ func (c *client) publish(data []publisher.Event) ([]publisher.Event, error) {
 
 	c.log.Infof("[transaction] commit successed, ok-exec-events: %d, fail-exec-events: %d", len(okExecEvents), len(failExecEvents))
 	return failExecEvents, lastErr
+}
+
+// sleepBeforeRetry sleep before retry
+func (c *client) sleepBeforeRetry(err error) {
+	c.log.Errorf("will sleep for %v seconds because an error occurs: %s", c.retryInterval, err)
+	time.Sleep(time.Second * time.Duration(c.retryInterval))
+}
+
+// generateSql
+func generateSql(table string, columns []string) string {
+	size := len(columns) - 1
+	var columnStr, valueStr strings.Builder
+	for i, cl := range columns {
+		columnStr.WriteString(cl)
+		valueStr.WriteString("?")
+		if i < size {
+			columnStr.WriteString(",")
+			valueStr.WriteString(",")
+		}
+	}
+
+	return fmt.Sprint("insert into ", table, " (", columnStr.String(), ") values (", valueStr.String(), ")")
+}
+
+// extractDataFromEvent extract data
+func extractDataFromEvent(
+	log *logp.Logger,
+	to [][]interface{},
+	data []publisher.Event,
+	columns []string,
+	grokStr string,
+	grokField string,
+	g *grok.Grok,
+) ([]publisher.Event, []publisher.Event, [][]interface{}) {
+	var okEvents, failEvents []publisher.Event
+	for _, event := range data {
+		content := event.Content
+		var row []interface{}
+		var err error
+		if grokField != "" && grokStr != "" {
+			row, err = matchFieldsGrok(content, columns, grokStr, grokField, g)
+		} else {
+			row, err = matchFields(content, columns)
+		}
+		if err != nil {
+			log.Errorf("match field error: {%+v}", err)
+			// match fail then append fail-events
+			failEvents = append(failEvents, event)
+			continue
+		}
+		to = append(to, row)
+		// match successed then append ok-events
+		okEvents = append(okEvents, event)
+	}
+	return okEvents, failEvents, to
+}
+
+// matchFields match field format
+func matchFields(content beat.Event, columns []string) ([]interface{}, error) {
+	row := make([]interface{}, 0)
+	for _, col := range columns {
+		if _, ok := content.Fields[col]; !ok {
+			return nil, errors.New("format error")
+		}
+		val, err := content.GetValue(col)
+		if err != nil {
+			return nil, err
+		}
+		// strict mode
+		//if val == nil {
+		//	return nil, errors.New("row field is empty")
+		//}
+		row = append(row, val)
+	}
+	return row, nil
+}
+
+// matchFields match field format with grok
+func matchFieldsGrok(content beat.Event, columns []string, grokStr, grokField string, g *grok.Grok) ([]interface{}, error) {
+	row := make([]interface{}, 0)
+	values, err := g.Parse(grokStr, content.Fields[grokField].(string))
+	if err != nil {
+		return nil, errors.New("grok cannot parse event")
+	}
+	for _, col := range columns {
+		if _, ok := values[col]; !ok {
+			return nil, errors.New("format error")
+		}
+		row = append(row, values[col])
+	}
+	return row, nil
 }
