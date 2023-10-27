@@ -1,0 +1,28 @@
+#=========================== Filebeat inputs =============================
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /tmp/record.log
+    json:
+      keys_under_root: true
+      overwrite_keys: true
+      close_inactive: 24h
+#================================ ClickHouse output ======================
+#----------------------------- ClickHouse output --------------------------------
+output.clickHouse:
+  # clickhouse数据库配置
+  # https://github.com/ClickHouse/clickhouse-go
+  # 示例 tcp://host1:9000?username=user&password=qwerty&database=clicks&read_timeout=10&write_timeout=20&alt_hosts=host2:9000,host3:9000
+  url: "tcp://127.0.0.1:9000?debug=true&read_timeout=10&write_timeout=20"
+  # 接收数据的表名
+  table: schemas.table
+  # 数据过滤器的表列，匹配日志文件中对应的键
+  columns: ["id", "name", "created_date"]
+  # 异常重试休眠时间 单位：秒
+  retry_interval: 3
+  # 是否跳过异常事件推送 true-表示跳过执行异常实践 false-会一直重试，重试间隔为retry_interval
+  skip_unexpected_type_row: true
+  # 如果配置了grok，可以使用grok的结果作为数据过滤器的表列
+  grok: "remote_addr\\[(?:%{NOTSPACE:ip}?|%{DATA})\\] \\| time_local\\[(?:%{HTTPDATE:time_local}?|%{DATA})\\] \\| server_name\\[(?:%{DATA:server_name}?|%{DATA})\\] \\| request\\[(?:%{WORD:method} %{URIPATH:url}(?:%{URIPARAM:params})? HTTP/%{NUMBER:http_version}?|%{DATA})\\] \\| status\\[(?:%{NUMBER:status}?|%{DATA})\\] \\| body_bytes_sent\\[(?:%{NUMBER:body_bytes_sent}?|%{DATA})\\] \\| http_referer\\[(?:%{NOTSPACE:http_referer}?|%{DATA})\\] \\| http_user_agent\\[(?:%{DATA:http_user_agent}?|%{DATA})\\] \\| http_x_forwarded_for\\[(?:%{NOTSPACE:http_x_forwarded_for}?|%{DATA})\\]"
+  grok_field: "field"
