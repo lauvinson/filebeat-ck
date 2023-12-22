@@ -255,10 +255,6 @@ func matchFields(content beat.Event, columns []string) ([]interface{}, error) {
 		if err != nil {
 			return nil, err
 		}
-		// strict mode
-		//if val == nil {
-		//	return nil, errors.New("row field is empty")
-		//}
 		row = append(row, val)
 	}
 	return row, nil
