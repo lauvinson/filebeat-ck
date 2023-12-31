@@ -115,7 +115,7 @@ func prepare() error {
 	if err != nil {
 		return err
 	}
-	clean()
+	_ = clean()
 	_, err = connect.Exec(`
 		CREATE TABLE IF NOT EXISTS ck_test (
 			id 				FixedString(36),
