@@ -6,7 +6,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 )
 
-var logger = logp.NewLogger("ClickHouse")
+var _ = logp.NewLogger("ClickHouse")
 
 func init() {
 	outputs.RegisterType("clickHouse", makeClickHouse)
