@@ -18,7 +18,7 @@ type clickHouseConfig struct {
 }
 
 var (
-	_ = clickHouseConfig{
+	defaultConfig = clickHouseConfig{
 		Url:                   "tcp://127.0.0.1:9000",
 		BulkMaxSize:           1000,
 		MaxRetries:            3,
